@@ -20,18 +20,20 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 
+#define X_SOH 0x01
 #define X_STX 0x02
 #define X_ACK 0x06
 #define X_NAK 0x15
 #define X_EOF 0x04
 
 #define min(a, b)       ((a) < (b) ? (a) : (b))
+#define PAYLOAD_LEN 128
 
 struct xmodem_chunk {
         uint8_t start;
         uint8_t block;
         uint8_t block_neg;
-        uint8_t payload[1024];
+        uint8_t payload[PAYLOAD_LEN];
         uint16_t crc;
 } __attribute__((packed));
 
@@ -124,7 +126,7 @@ static int xymodem_send(int serial_fd, const char *filename, int protocol, int w
                 chunk.block = 1;
         }
 
-        chunk.start = X_STX;
+        chunk.start = X_SOH;
 
         while (len) {
                 size_t z = 0;
